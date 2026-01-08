@@ -1,6 +1,6 @@
 # Exercise 8: Embeddings
 
-Deadline: 18.12.2025 23:59
+Deadline: 14.01.2026 23:59
 
 This is the eighth exercise, and it is about input representation using embeddings.
 
