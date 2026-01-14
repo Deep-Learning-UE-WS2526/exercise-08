@@ -1,13 +1,14 @@
+import numpy as np
 import bz2
 
-import numpy as np
+import tensorflow as tf
+from keras import models, layers
+from keras.preprocessing.text import Tokenizer, text_to_word_sequence
+from keras.preprocessing.sequence import pad_sequences
+from keras.layers import Embedding
 
-from tensorflow.python.keras import models, layers
-from tensorflow.keras.preprocessing.text import Tokenizer, text_to_word_sequence
-from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras import regularizers
 
-
+#MAX_LENGTH = 100
 def get_labels_and_texts(file, n=10000):
     labels = []
     texts = []
@@ -24,8 +25,23 @@ def get_labels_and_texts(file, n=10000):
 
 train_labels, train_texts = get_labels_and_texts('data/train.ft.txt.bz2')
 
+# Preprocessing
+tokenizer = Tokenizer()
+tokenizer.fit_on_texts(train_texts)
+vocab_size = len(tokenizer. word_index) + 1 #Größe des Vokabulars berechenn:
+#tokenizer. word_index: Dictionary das jedes einzigartige Wort/Token auf eine Zahl mappt
+#len(tokenizer.word_index): zählt alle einzigartigen Wörter
+# +1 da Wörterzählung ab Index 1 beginnt (0 ist reserviert für Padding)
+train_texts = tokenizer.texts_to_sequences(train_texts)
+
+MAX_LENGTH = max(len(train_ex) for train_ex in train_texts)
+train_texts = pad_sequences(train_texts, maxlen=MAX_LENGTH, padding="post")
+embedding_dim = 100
 
 ffnn = models.Sequential()
+#embedding-layer
+ffnn.add(Embedding(vocab_size, embedding_dim, input_length=MAX_LENGTH))
+ffnn.add(layers.Flatten())
 ffnn.add(layers.Input(shape=(MAX_LENGTH,)))
 ffnn.add(layers.Dense(100, activation="sigmoid"))
 ffnn.add(layers.Dropout(0.5))
